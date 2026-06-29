@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Base de données – Recherche</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f5f5f5;
+    color: #222;
+}
+body.dark {
+    background: #1e1e1e;
+    color: #eaeaea;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: left;
+}
+.filter-box {
+    margin-top: 15px;
+    padding: 10px;
+    background: #e9e9e9;
+    border-radius: 6px;
+}
+#pagination button {
+    margin: 3px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+#darkToggle, #clearBtn {
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#darkToggle {
+    background: #444;
+    color: white;
+}
+#clearBtn {
+    background: #d9534f;
+    color: white;
+    margin-left: 10px;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+</head>
+
+<body>
+
+<h2>Base de données – Recherche</h2>
+
+<button id="darkToggle">Mode sombre</button>
+
+<br><br>
+
+<input type="text" id="search" placeholder="Rechercher... (ex : ami*, ~amiel)" style="padding:8px; width:300px;">
+<button id="clearBtn">Effacer</button>
+
+<br><br>
+
+<div class="filter-box">
+    <strong>Filtres :</strong><br><br>
+
+    Commune :
+    <select id="filterCom">
+        <option value="">-- Toutes --</option>
+    </select>
+
+    Type :
+    <select id="filterType">
+        <option value="">-- Tous --</option>
+    </select>
+
+    Source :
+    <select id="filterSource">
+        <option value="">-- Toutes --</option>
+    </select>
+
+    Année :
+    <select id="filterYear">
+        <option value="">-- Toutes --</option>
+    </select>
+</div>
+
+<br>
+
+<select id="sortColumn">
+    <option value="">-- Trier par --</option>
+    <option value="num">Numéro</option>
+    <option value="pre">Prénom</option>
+    <option value="nom">Nom</option>
+    <option value="a">Année</option>
+    <option value="type">Type</option>
+    <option value="source">Source</option>
+</select>
+
+<button id="sortOrder">Ordre croissant</button>
+
+<div id="results"></div>
+<div id="pagination"></div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
+
