@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Convertisseur Républicain</title>
+    
+    <!-- Balises pour transformer le site en Application Mobile (PWA) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calendrier Rép.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNvbnZlcnRpc3NldXIgQ2FsZW5kcmllciBSw6lwdWJsaWNhaW4iLAogICJzaG9ydF9uYW1lIjogIlLDqXB1YmxpY2FpbiIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjJmNWYzIiwKICAidGhlbWVfY29sb3IiOiAiIzU1NmI1YyIKfQ==">
+
+    <style>
+        /* Palette de tons verts pastels et doux */
+        :root {
+            --primary: #556b5c;       /* Vert sauge soutenu */
+            --secondary: #8da393;     /* Vert eucalyptus doux */
+            --accent: #d2ded5;        /* Vert pastel clair */
+            --bg: #f2f5f3;            /* Fond de page gris-vert très clair */
+            --card-bg: #ffffff;       /* Fond blanc pour la carte */
+            --text: #2f3631;          /* Texte sombre teinté de vert */
+            --border: #e1e6e2;        /* Bordures douces */
+            --box-bg: #f6f8f6;        /* Fond de boîte de résultat */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(85, 107, 92, 0.06);
+            border: 1px solid var(--border);
+            max-width: 450px;
+            width: 100%;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 0 0 4px 0;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--secondary);
+            font-style: italic;
+            margin-bottom: 24px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 24px;
+            background-color: #eaebea;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #717d74;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 8px rgba(85, 107, 92, 0.08);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            background-color: #fff;
+            color: var(--text);
+            appearance: none;
+            -webkit-appearance: none;
+            transition: all 0.2s ease;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23556b5c' d='M0 0l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 32px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(141, 163, 147, 0.15);
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .row .form-group:nth-child(1) { flex: 1.5; }
+        .row .form-group:nth-child(2) { flex: 3.2; }  
+        .row .form-group:nth-child(3) { flex: 2.3; }
+
+        .result-box {
+            margin-top: 24px;
+            padding: 18px;
+            background-color: var(--box-bg);
+            border-radius: 12px;
+            text-align: center;
+            border: 1px dashed var(--accent);
+        }
+
+        .result-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .result-value {
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: var(--primary);
+            line-height: 1.3;
+        }
+
+        .info {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* Style ajusté pour le lien de Copyright */
+        .copyright {
+            margin-top: 25px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .copyright a {
+            font-size: 0.75rem;
+            color: #a4b0a7;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .copyright a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calendrier Républicain</h1>
+    <div class="subtitle">Convertisseur Temporel</div>
+
+    <div class="tabs">
+        <div id="tab-gtor" class="tab active" onclick="switchTab('greg-to-rep')">Grégorien ➔ Rép.</div>
+        <div id="tab-rtog" class="tab" onclick="switchTab('rep-to-greg')">Républicain ➔ Grég.</div>
+    </div>
+
+    <!-- APPLICATION : GREGORIEN VERS REPUBLICAIN -->
+    <div id="greg-to-rep" class="panel active">
+        <div class="form-group">
+            <label for="greg-date">Choisir une date grégorienne</label>
+            <input type="date" id="greg-date" onchange="convertToRepublican()">
+        </div>
+        <div class="result-box">
+            <div class="result-title">Date Révolutionnaire</div>
+            <div id="rep-result" class="result-value">-</div>
+            <div id="rep-info" class="info"></div>
+        </div>
+    </div>
+
+    <!-- APPLICATION : REPUBLICAIN VERS GREGORIEN -->
+    <div id="rep-to-greg" class="panel">
+        <div class="row">
+            <div class="form-group">
+                <label for="rep-day">Jour</label>
+                <select id="rep-day" onchange="convertToGregorian()"></select>
+            </div>
+            <div class="form-group">
+                <label for="rep-month">Mois</label>
+                <select id="rep-month" onchange="updateDays(); convertToGregorian();">
+                    <option value="1">Vendémiaire</option>
+                    <option value="2">Brumaire</option>
+                    <option value="3">Frimaire</option>
+                    <option value="4">Nivôse</option>
+                    <option value="5">Pluviôse</option>
+                    <option value="6">Ventôse</option>
+                    <option value="7">Germinal</option>
+                    <option value="8">Floréal</option>
+                    <option value="9">Prairial</option>
+                    <option value="10">Messidor</option>
+                    <option value="11">Thermidor</option>
+                    <option value="12">Fructidor</option>
+                    <option value="13">Sans-culottides</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rep-year">Année</label>
+                <select id="rep-year" onchange="updateDays(); convertToGregorian();"></select>
+            </div>
+        </div>
+        <div class="result-box">
+            <div class="result-title">Date Grégorienne</div>
+            <div id="greg-result" class="result-value">-</div>
+        </div>
+    </div>
+
+    <!-- Zone Mentions Légales / Copyright Cliquable -->
+    <div class="copyright">
+        <a href="https://genealogie31.fr" target="_blank">@copyright genealogie31.fr</a>
+    </div>
+</div>
+
+<script>
+    const moisRep = ["Vendémiaire", "Brumaire", "Frimaire", "Nivôse", "Pluviôse", "Ventôse", "Germinal", "Floréal", "Prairial", "Messidor", "Thermidor", "Fructidor", "Sans-culottides"];
+    const joursDecade = ["Primidi", "Duodi", "Tridi", "Quartidi", "Quintidi", "Sextidi", "Septidi", "Octidi", "Nonidi", "Décadi"];
+    const joursSansCulottides = ["Jour de la Vertu", "Jour du Génie", "Jour du Travail", "Jour de l'Opinion", "Jour des Récompenses", "Jour de la Révolution"];
+
+    function toRoman(num) {
+        const lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+        let roman = '';
+        for (let i in lookup) { while (num >= lookup[i]) { roman += i; num -= lookup[i]; } }
+        return roman;
+    }
+
+    function init() {
+        const yearSelect = document.getElementById('rep-year');
+        for (let i = 1; i <= 260; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `An ${toRoman(i)}`;
+            if (i === 234) opt.selected = true; 
+            yearSelect.appendChild(opt);
+        }
+        updateDays();
+        const today = new Date();
+        document.getElementById('greg-date').value = today.toISOString().split('T')[0];
+        convertToRepublican();
+        convertToGregorian();
+        
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7fSk7');
+        }
+    }
+
+    function updateDays() {
+        const month = parseInt(document.getElementById('rep-month').value);
+        const year = parseInt(document.getElementById('rep-year').value);
+        const daySelect = document.getElementById('rep-day');
+        const currentVal = daySelect.value;
+        
+        daySelect.innerHTML = '';
+        let maxDays = (month === 13) ? (isLeapRepublican(year) ? 6 : 5) : 30;
+
+        for (let i = 1; i <= maxDays; i++) {
+            let opt = document.createElement('option');
+            opt.value = i; opt.textContent = i;
+            daySelect.appendChild(opt);
+        }
+        if (currentVal && currentVal <= maxDays) daySelect.value = currentVal;
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        
+        if(tabId === 'greg-to-rep') document.getElementById('tab-gtor').classList.add('active');
+        else document.getElementById('tab-rtog').classList.add('active');
+        
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function isLeapRepublican(an) {
+        if (an <= 11) return [3, 7, 11].includes(an);
+        return (an % 4 === 0); 
+    }
+
+    function getStartOfRepublicanYear(an) {
+        const datesCalculées = {
+            1: new Date(1792, 8, 22), 2: new Date(1793, 8, 22), 3: new Date(1794, 8, 22),
+            4: new Date(1795, 8, 23), 5: new Date(1796, 8, 22), 6: new Date(1797, 8, 22),
+            7: new Date(1798, 8, 22), 8: new Date(1799, 8, 23), 9: new Date(1800, 8, 23),
+            10: new Date(1801, 8, 23), 11: new Date(1802, 8, 23), 12: new Date(1803, 8, 24),
+            13: new Date(1804, 8, 23), 14: new Date(1805, 8, 23)
+        };
+        if (datesCalculées[an]) return datesCalculées[an];
+        
+        let date = new Date(1804, 8, 23);
+        for (let i = 13; i < an; i++) {
+            let daysInYear = isLeapRepublican(i) ? 366 : 365;
+            date.setTime(date.getTime() + daysInYear * 86400000);
+        }
+        return date;
+    }
+
+    function convertToRepublican() {
+        const gregInput = document.getElementById('greg-date').value;
+        if (!gregInput) return;
+
+        const targetDate = new Date(gregInput);
+        targetDate.setHours(0,0,0,0);
+
+        if (targetDate < getStartOfRepublicanYear(1)) {
+            document.getElementById('rep-result').textContent = "Avant la Révolution !";
+            document.getElementById('rep-info').textContent = "";
+            return;
+        }
+
+        let an = 1;
+        let dateDebut = getStartOfRepublicanYear(an);
+        let dateSuivante = getStartOfRepublicanYear(an + 1);
+
+        while (targetDate >= dateSuivante) {
+            an++;
+            dateDebut = dateSuivante;
+            dateSuivante = getStartOfRepublicanYear(an + 1);
+        }
+
+        const diffDays = Math.floor(Math.abs(targetDate - dateDebut) / 86400000);
+        let numMois = Math.floor(diffDays / 30) + 1;
+        let jourMois = (diffDays % 30) + 1;
+        let nomMois = moisRep[numMois - 1];
+        let infoDecade = "";
+
+        if (numMois === 13) {
+            nomMois = "Sans-culottides";
+            infoDecade = joursSansCulottides[jourMois - 1];
+        } else {
+            infoDecade = joursDecade[(jourMois - 1) % 10];
+        }
+
+        document.getElementById('rep-result').textContent = `${jourMois} ${nomMois} An ${toRoman(an)}`;
+        document.getElementById('rep-info').textContent = infoDecade;
+    }
+
+    function convertToGregorian() {
+        const jour = parseInt(document.getElementById('rep-day').value);
+        const mois = parseInt(document.getElementById('rep-month').value);
+        const an = parseInt(document.getElementById('rep-year').value);
+
+        if (!jour || !mois || !an) return;
+
+        let dateResultat = getStartOfRepublicanYear(an);
+        dateResultat.setDate(dateResultat.getDate() + ((mois - 1) * 30 + (jour - 1)));
+
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('greg-result').textContent = dateResultat.toLocaleDateString('fr-FR', options);
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
